@@ -18,15 +18,15 @@ playerHeight = 20
 playerWidth = 20
 
 initialize :: SDL.Renderer -> (Int,Int) -> Player
-initialize r (x,y) = Player (Rectangle x y playerWidth playerHeight) (0,2) 0 True (loadImage r "src/dot.bmp")
+initialize r (x,y) = Player (Rectangle x y playerWidth playerHeight) (0,2) 0 True (loadImage r "data/Asteroids_Spaceship.bmp")
 
 update :: KeyboardState -> [A.Asteroid] -> Player -> Player
 update kS asts p = snd $ runState (updateS kS asts) p
 
 updateS :: KeyboardState -> [A.Asteroid] -> State Player ()
 updateS kS asts = do
-    direction -= if isDown kS SDL.ScancodeLeft then (20.0/360.0) else 0
-    direction += if isDown kS SDL.ScancodeRight then (20.0/360.0) else 0
+    direction -= if isDown kS SDL.ScancodeLeft then (1.0/9.0) else 0
+    direction += if isDown kS SDL.ScancodeRight then (1.0/9.0) else 0
     direction %= (`mod'` (2*pi))
     dir <- use direction
     if isDown kS SDL.ScancodeUp then do

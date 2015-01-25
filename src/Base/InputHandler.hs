@@ -51,5 +51,5 @@ update ks = do
         Nothing -> return (False,ks)
         Just ev -> case (SDL.eventPayload ev) of
            SDL.QuitEvent -> return (True,ks)
-           SDL.KeyboardEvent _ motion _ _ sym -> update (modKeyboardState ks motion sym)
-           _ -> return (False,ks)
+           SDL.KeyboardEvent _ motion _ False sym -> update (modKeyboardState ks motion sym)
+           _ -> update ks
