@@ -1,0 +1,21 @@
+Configuring sdl2-1.3.0...
+Building sdl2-1.3.0...
+Preprocessing library sdl2-1.3.0...
+[ 1 of 13] Compiling Graphics.UI.SDL.Platform ( Graphics/UI/SDL/Platform.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Platform.o )
+[ 2 of 13] Compiling Graphics.UI.SDL.Enum ( dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Enum.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Enum.o )
+[ 3 of 13] Compiling Graphics.UI.SDL.Power ( Graphics/UI/SDL/Power.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Power.o )
+[ 4 of 13] Compiling Graphics.UI.SDL.Types ( dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Types.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Types.o )
+[ 5 of 13] Compiling Graphics.UI.SDL.Filesystem ( Graphics/UI/SDL/Filesystem.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Filesystem.o )
+[ 6 of 13] Compiling Graphics.UI.SDL.Event ( Graphics/UI/SDL/Event.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Event.o )
+[ 7 of 13] Compiling Graphics.UI.SDL.Haptic ( Graphics/UI/SDL/Haptic.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Haptic.o )
+[ 8 of 13] Compiling Graphics.UI.SDL.Thread ( Graphics/UI/SDL/Thread.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Thread.o )
+[ 9 of 13] Compiling Graphics.UI.SDL.Timer ( Graphics/UI/SDL/Timer.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Timer.o )
+[10 of 13] Compiling Graphics.UI.SDL.Video ( Graphics/UI/SDL/Video.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Video.o )
+[11 of 13] Compiling Graphics.UI.SDL.Basic ( Graphics/UI/SDL/Basic.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Basic.o )
+[12 of 13] Compiling Graphics.UI.SDL.Audio ( Graphics/UI/SDL/Audio.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL/Audio.o )
+[13 of 13] Compiling Graphics.UI.SDL  ( Graphics/UI/SDL.hs, dist/dist-sandbox-dafda09e/build/Graphics/UI/SDL.o )
+In-place registering sdl2-1.3.0...
+Creating package registration file: /tmp/pkgConf-sdl2-1.36561.0
+Installing library in
+/home/mdietz/Documents/Projects/GitHub/asteroids/.cabal-sandbox/lib/x86_64-linux-ghc-7.8.4/sdl2-1.3.0
+Registering sdl2-1.3.0...

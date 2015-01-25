@@ -1,0 +1,183 @@
+Configuring sdl2-2.0.0...
+Building sdl2-2.0.0...
+Preprocessing library sdl2-2.0.0...
+[ 1 of 35] Compiling SDL.Raw.Platform ( src/SDL/Raw/Platform.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Platform.o )
+[ 2 of 35] Compiling SDL.Input.GameController ( src/SDL/Input/GameController.hs, dist/dist-sandbox-dafda09e/build/SDL/Input/GameController.o )
+[ 3 of 35] Compiling Data.Bitmask     ( src/Data/Bitmask.hs, dist/dist-sandbox-dafda09e/build/Data/Bitmask.o )
+[ 4 of 35] Compiling SDL.Internal.Numbered ( src/SDL/Internal/Numbered.hs, dist/dist-sandbox-dafda09e/build/SDL/Internal/Numbered.o )
+[ 5 of 35] Compiling SDL.Raw.Enum     ( dist/dist-sandbox-dafda09e/build/SDL/Raw/Enum.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Enum.o )
+[ 6 of 35] Compiling SDL.Raw.Types    ( dist/dist-sandbox-dafda09e/build/SDL/Raw/Types.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Types.o )
+[ 7 of 35] Compiling SDL.Raw.Filesystem ( src/SDL/Raw/Filesystem.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Filesystem.o )
+[ 8 of 35] Compiling SDL.Raw.Timer    ( src/SDL/Raw/Timer.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Timer.o )
+[ 9 of 35] Compiling SDL.Raw.Haptic   ( src/SDL/Raw/Haptic.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Haptic.o )
+[10 of 35] Compiling SDL.Input.Keyboard.Codes ( src/SDL/Input/Keyboard/Codes.hs, dist/dist-sandbox-dafda09e/build/SDL/Input/Keyboard/Codes.o )
+[11 of 35] Compiling SDL.Raw.Event    ( src/SDL/Raw/Event.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Event.o )
+[12 of 35] Compiling SDL.Raw.Basic    ( src/SDL/Raw/Basic.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Basic.o )
+[13 of 35] Compiling SDL.Raw.Power    ( src/SDL/Raw/Power.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Power.o )
+[14 of 35] Compiling SDL.Raw.Thread   ( src/SDL/Raw/Thread.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Thread.o )
+[15 of 35] Compiling SDL.Raw.Video    ( src/SDL/Raw/Video.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Video.o )
+[16 of 35] Compiling SDL.Raw.Audio    ( src/SDL/Raw/Audio.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw/Audio.o )
+[17 of 35] Compiling SDL.Raw          ( src/SDL/Raw.hs, dist/dist-sandbox-dafda09e/build/SDL/Raw.o )
+[18 of 35] Compiling SDL.Internal.Types ( src/SDL/Internal/Types.hs, dist/dist-sandbox-dafda09e/build/SDL/Internal/Types.o )
+[19 of 35] Compiling SDL.Input.Keyboard ( src/SDL/Input/Keyboard.hs, dist/dist-sandbox-dafda09e/build/SDL/Input/Keyboard.o )
+[20 of 35] Compiling SDL.Exception    ( src/SDL/Exception.hs, dist/dist-sandbox-dafda09e/build/SDL/Exception.o )
+[21 of 35] Compiling SDL.Input.Mouse  ( src/SDL/Input/Mouse.hs, dist/dist-sandbox-dafda09e/build/SDL/Input/Mouse.o )
+[22 of 35] Compiling SDL.Input.Joystick ( src/SDL/Input/Joystick.hs, dist/dist-sandbox-dafda09e/build/SDL/Input/Joystick.o )
+[23 of 35] Compiling SDL.Video.OpenGL ( src/SDL/Video/OpenGL.hs, dist/dist-sandbox-dafda09e/build/SDL/Video/OpenGL.o )
+[24 of 35] Compiling SDL.Video.Renderer ( src/SDL/Video/Renderer.hs, dist/dist-sandbox-dafda09e/build/SDL/Video/Renderer.o )
+[25 of 35] Compiling SDL.Video        ( src/SDL/Video.hs, dist/dist-sandbox-dafda09e/build/SDL/Video.o )
+[26 of 35] Compiling SDL.Time         ( src/SDL/Time.hs, dist/dist-sandbox-dafda09e/build/SDL/Time.o )
+[27 of 35] Compiling SDL.Power        ( src/SDL/Power.hs, dist/dist-sandbox-dafda09e/build/SDL/Power.o )
+[28 of 35] Compiling SDL.Input        ( src/SDL/Input.hs, dist/dist-sandbox-dafda09e/build/SDL/Input.o )
+
+src/SDL/Input.hs:2:5: Warning:
+    The export item `module SDL.Input.GameController' exports nothing
+
+src/SDL/Input.hs:8:1: Warning:
+    The import of ‘SDL.Input.GameController’ is redundant
+      except perhaps to import instances from ‘SDL.Input.GameController’
+    To import instances alone, use: import SDL.Input.GameController()
+[29 of 35] Compiling SDL.Hint         ( src/SDL/Hint.hs, dist/dist-sandbox-dafda09e/build/SDL/Hint.o )
+[30 of 35] Compiling SDL.Haptic       ( src/SDL/Haptic.hs, dist/dist-sandbox-dafda09e/build/SDL/Haptic.o )
+
+src/SDL/Haptic.hs:57:5: Warning:
+    Defined but not used: ‘hapticDevicePtr’
+
+src/SDL/Haptic.hs:101:48: Warning:
+    This binding for ‘length’ shadows the existing binding
+      imported from ‘Prelude’ at src/SDL/Haptic.hs:4:8-17
+      (and originally defined in ‘GHC.List’)
+
+src/SDL/Haptic.hs:113:5: Warning:
+    Defined but not used: ‘envelopeAttackLength’
+
+src/SDL/Haptic.hs:114:5: Warning:
+    Defined but not used: ‘envelopeAttackLevel’
+
+src/SDL/Haptic.hs:115:5: Warning:
+    Defined but not used: ‘envelopeFadeLength’
+
+src/SDL/Haptic.hs:116:5: Warning:
+    Defined but not used: ‘envelopeFadeLevel’
+[31 of 35] Compiling SDL.Filesystem   ( src/SDL/Filesystem.hs, dist/dist-sandbox-dafda09e/build/SDL/Filesystem.o )
+[32 of 35] Compiling SDL.Event        ( src/SDL/Event.hs, dist/dist-sandbox-dafda09e/build/SDL/Event.o )
+
+src/SDL/Event.hs:55:19: Warning:
+    Pattern match(es) are non-exhaustive
+    In a case alternative: Patterns not matched: _
+
+src/SDL/Event.hs:229:1: Warning:
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘convertRaw’:
+        Patterns not matched: Raw.KeyboardEvent _ _ _ _ _ _
+
+src/SDL/Event.hs:262:9: Warning:
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘motion’: Patterns not matched:
+[33 of 35] Compiling SDL.Audio        ( src/SDL/Audio.hs, dist/dist-sandbox-dafda09e/build/SDL/Audio.o )
+[34 of 35] Compiling SDL.Init         ( src/SDL/Init.hs, dist/dist-sandbox-dafda09e/build/SDL/Init.o )
+[35 of 35] Compiling SDL              ( src/SDL.hs, dist/dist-sandbox-dafda09e/build/SDL.o )
+In-place registering sdl2-2.0.0...
+Preprocessing executable 'lazyfoo-lesson-01' for sdl2-2.0.0...
+[1 of 1] Compiling Lazyfoo.Lesson01 ( examples/lazyfoo/Lesson01.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-01/lazyfoo-lesson-01-tmp/Lazyfoo/Lesson01.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-01/lazyfoo-lesson-01 ...
+Preprocessing executable 'lazyfoo-lesson-02' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-02/lazyfoo-lesson-02-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson02 ( examples/lazyfoo/Lesson02.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-02/lazyfoo-lesson-02-tmp/Lazyfoo/Lesson02.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-02/lazyfoo-lesson-02 ...
+Preprocessing executable 'lazyfoo-lesson-03' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-03/lazyfoo-lesson-03-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson03 ( examples/lazyfoo/Lesson03.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-03/lazyfoo-lesson-03-tmp/Lazyfoo/Lesson03.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-03/lazyfoo-lesson-03 ...
+Preprocessing executable 'lazyfoo-lesson-04' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-04/lazyfoo-lesson-04-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson04 ( examples/lazyfoo/Lesson04.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-04/lazyfoo-lesson-04-tmp/Lazyfoo/Lesson04.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-04/lazyfoo-lesson-04 ...
+Preprocessing executable 'lazyfoo-lesson-05' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-05/lazyfoo-lesson-05-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson05 ( examples/lazyfoo/Lesson05.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-05/lazyfoo-lesson-05-tmp/Lazyfoo/Lesson05.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-05/lazyfoo-lesson-05 ...
+Preprocessing executable 'lazyfoo-lesson-07' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-07/lazyfoo-lesson-07-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson07 ( examples/lazyfoo/Lesson07.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-07/lazyfoo-lesson-07-tmp/Lazyfoo/Lesson07.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-07/lazyfoo-lesson-07 ...
+Preprocessing executable 'lazyfoo-lesson-08' for sdl2-2.0.0...
+[1 of 1] Compiling Lazyfoo.Lesson08 ( examples/lazyfoo/Lesson08.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-08/lazyfoo-lesson-08-tmp/Lazyfoo/Lesson08.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-08/lazyfoo-lesson-08 ...
+Preprocessing executable 'lazyfoo-lesson-09' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-09/lazyfoo-lesson-09-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson09 ( examples/lazyfoo/Lesson09.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-09/lazyfoo-lesson-09-tmp/Lazyfoo/Lesson09.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-09/lazyfoo-lesson-09 ...
+Preprocessing executable 'lazyfoo-lesson-10' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-10/lazyfoo-lesson-10-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson10 ( examples/lazyfoo/Lesson10.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-10/lazyfoo-lesson-10-tmp/Lazyfoo/Lesson10.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-10/lazyfoo-lesson-10 ...
+Preprocessing executable 'lazyfoo-lesson-11' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-11/lazyfoo-lesson-11-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson11 ( examples/lazyfoo/Lesson11.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-11/lazyfoo-lesson-11-tmp/Lazyfoo/Lesson11.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-11/lazyfoo-lesson-11 ...
+Preprocessing executable 'lazyfoo-lesson-12' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-12/lazyfoo-lesson-12-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson12 ( examples/lazyfoo/Lesson12.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-12/lazyfoo-lesson-12-tmp/Lazyfoo/Lesson12.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-12/lazyfoo-lesson-12 ...
+Preprocessing executable 'lazyfoo-lesson-13' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-13/lazyfoo-lesson-13-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson13 ( examples/lazyfoo/Lesson13.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-13/lazyfoo-lesson-13-tmp/Lazyfoo/Lesson13.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-13/lazyfoo-lesson-13 ...
+Preprocessing executable 'lazyfoo-lesson-14' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-14/lazyfoo-lesson-14-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson14 ( examples/lazyfoo/Lesson14.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-14/lazyfoo-lesson-14-tmp/Lazyfoo/Lesson14.o )
+
+examples/lazyfoo/Lesson14.hs:73:7: Warning:
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘loop’: Patterns not matched: []
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-14/lazyfoo-lesson-14 ...
+Preprocessing executable 'lazyfoo-lesson-15' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-15/lazyfoo-lesson-15-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson15 ( examples/lazyfoo/Lesson15.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-15/lazyfoo-lesson-15-tmp/Lazyfoo/Lesson15.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-15/lazyfoo-lesson-15 ...
+Preprocessing executable 'lazyfoo-lesson-16' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-16/lazyfoo-lesson-16-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson16 ( examples/lazyfoo/Lesson16.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-16/lazyfoo-lesson-16-tmp/Lazyfoo/Lesson16.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-16/lazyfoo-lesson-16 ...
+Preprocessing executable 'lazyfoo-lesson-18' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-18/lazyfoo-lesson-18-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson18 ( examples/lazyfoo/Lesson18.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-18/lazyfoo-lesson-18-tmp/Lazyfoo/Lesson18.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-18/lazyfoo-lesson-18 ...
+Preprocessing executable 'lazyfoo-lesson-19' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-19/lazyfoo-lesson-19-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson19 ( examples/lazyfoo/Lesson19.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-19/lazyfoo-lesson-19-tmp/Lazyfoo/Lesson19.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-19/lazyfoo-lesson-19 ...
+Preprocessing executable 'lazyfoo-lesson-20' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-20/lazyfoo-lesson-20-tmp/Paths_sdl2.o )
+[2 of 2] Compiling Lazyfoo.Lesson20 ( examples/lazyfoo/Lesson20.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-20/lazyfoo-lesson-20-tmp/Lazyfoo/Lesson20.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-20/lazyfoo-lesson-20 ...
+Preprocessing executable 'lazyfoo-lesson-43' for sdl2-2.0.0...
+[1 of 1] Compiling Lazyfoo.Lesson43 ( examples/lazyfoo/Lesson43.hs, dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-43/lazyfoo-lesson-43-tmp/Lazyfoo/Lesson43.o )
+Linking dist/dist-sandbox-dafda09e/build/lazyfoo-lesson-43/lazyfoo-lesson-43 ...
+Preprocessing executable 'twinklebear-lesson-01' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-01/twinklebear-lesson-01-tmp/Paths_sdl2.o )
+[2 of 2] Compiling TwinkleBear.Lesson01 ( examples/twinklebear/Lesson01.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-01/twinklebear-lesson-01-tmp/TwinkleBear/Lesson01.o )
+Linking dist/dist-sandbox-dafda09e/build/twinklebear-lesson-01/twinklebear-lesson-01 ...
+Preprocessing executable 'twinklebear-lesson-02' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-02/twinklebear-lesson-02-tmp/Paths_sdl2.o )
+[2 of 2] Compiling TwinkleBear.Lesson02 ( examples/twinklebear/Lesson02.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-02/twinklebear-lesson-02-tmp/TwinkleBear/Lesson02.o )
+Linking dist/dist-sandbox-dafda09e/build/twinklebear-lesson-02/twinklebear-lesson-02 ...
+Preprocessing executable 'twinklebear-lesson-04' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04/twinklebear-lesson-04-tmp/Paths_sdl2.o )
+[2 of 2] Compiling TwinkleBear.Lesson04 ( examples/twinklebear/Lesson04.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04/twinklebear-lesson-04-tmp/TwinkleBear/Lesson04.o )
+Linking dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04/twinklebear-lesson-04 ...
+Preprocessing executable 'twinklebear-lesson-04a' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04a/twinklebear-lesson-04a-tmp/Paths_sdl2.o )
+[2 of 2] Compiling TwinkleBear.Lesson04a ( examples/twinklebear/Lesson04a.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04a/twinklebear-lesson-04a-tmp/TwinkleBear/Lesson04a.o )
+Linking dist/dist-sandbox-dafda09e/build/twinklebear-lesson-04a/twinklebear-lesson-04a ...
+Preprocessing executable 'twinklebear-lesson-05' for sdl2-2.0.0...
+[1 of 2] Compiling Paths_sdl2       ( dist/dist-sandbox-dafda09e/build/autogen/Paths_sdl2.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-05/twinklebear-lesson-05-tmp/Paths_sdl2.o )
+[2 of 2] Compiling TwinkleBear.Lesson05 ( examples/twinklebear/Lesson05.hs, dist/dist-sandbox-dafda09e/build/twinklebear-lesson-05/twinklebear-lesson-05-tmp/TwinkleBear/Lesson05.o )
+Linking dist/dist-sandbox-dafda09e/build/twinklebear-lesson-05/twinklebear-lesson-05 ...
+Creating package registration file: /tmp/pkgConf-sdl2-2.011587.0
+Installing library in
+/home/mdietz/Documents/Projects/GitHub/asteroids/.cabal-sandbox/lib/x86_64-linux-ghc-7.8.4/sdl2-2.0.0
+Installing executable(s) in
+/home/mdietz/Documents/Projects/GitHub/asteroids/.cabal-sandbox/bin
+Registering sdl2-2.0.0...

@@ -7,12 +7,11 @@ import Control.Monad.State
 import Control.Monad.Reader
 import qualified Player as P
 import qualified Level as L
-import qualified Asteroids as A
+import qualified Asteroid as A
 import qualified Base.GraphicsManager as G
 import qualified Base.InputHandler as IH
-import qualified Base.AudioManager as AM
 import qualified Base.Geometry as Geo
-import qualified Graphics.UI.SDL as SDL
+import qualified SDL as SDL
 import Timer
 import Config
 
@@ -26,7 +25,7 @@ data AppData = AppData {
 }
 
 data AppConfig = AppConfig {
-    screen    :: SDL.Surface
+    screen    :: SDL.Renderer
 }
 
 type AppState = StateT AppData IO
@@ -35,7 +34,7 @@ type AppEnv = ReaderT AppConfig AppState
 putFPS :: MonadState AppData m => Timer -> m ()
 putFPS t = modify $ \s -> s { fps = t }
 
-getScreen :: MonadReader AppConfig m => m SDL.Surface
+getScreen :: MonadReader AppConfig m => m SDL.Renderer
 getScreen = liftM screen ask
 
 modifyFPSM :: MonadState AppData m => (Timer -> m Timer) -> m ()
@@ -50,9 +49,8 @@ putKeyboardState t = modify $ \s -> s { keyboardState = t }
 initEnv :: IO (AppConfig, AppData)
 initEnv = do    
     screen <- G.initialize height width "Best Game Ever"
-    AM.initialize
     (_,keys) <- IH.initialize
-    level <- L.initialize 0
+    level <- L.initialize screen 0
     fps <- start defaultTimer
     return (AppConfig screen, AppData level keys fps) 
 
@@ -69,13 +67,13 @@ loop = do
     fps <- liftM fps get
     level <- liftM level get
     let (won,nL) = L.update keyState level
-    if won then liftIO (L.initialize ((L.lId . L.lC $ nL) + 1)) >>= putLevel else putLevel nL
+    screen    <- getScreen
+    if won then liftIO (L.initialize screen ((L.lId . L.lC $ nL) + 1)) >>= putLevel else putLevel nL
 
     putKeyboardState $ IH.putLastKeyboardState keyState
 
     -- Drawing Code
 
-    screen    <- getScreen
     liftIO $ do
         G.begin screen
         L.draw screen nL
@@ -95,6 +93,7 @@ loop = do
 runLoop :: AppConfig -> AppData -> IO ()
 runLoop = evalStateT . runReaderT loop
 
-main = SDL.withInit [SDL.InitEverything] $ do -- withInit calls quit for us.
+main = do
+    SDL.initialize [SDL.InitEverything]
     (env, state) <- initEnv
     runLoop env state

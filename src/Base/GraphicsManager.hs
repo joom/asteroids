@@ -1,10 +1,12 @@
 module Base.GraphicsManager where
 
-import qualified Graphics.UI.SDL as SDL
-import qualified Graphics.UI.SDL.Image as SDL
-import qualified Graphics.UI.SDL.TTF as SDL
+import qualified SDL as SDL
+import qualified SDL.Video as SDL
+import Linear as SDL
+import Linear.Affine (Point(P))
 import Data.Word(Word8)
 import Control.Monad(liftM)
+import Data.Text(pack)
 
 type Width = Int
 type Height = Int
@@ -15,17 +17,17 @@ screenWidth  = 640
 screenHeight = 480
 screenBpp    = 32
 
-loadImage :: String -> Maybe (Word8, Word8, Word8) -> IO SDL.Surface
-loadImage filename colorKey = SDL.load filename >>= SDL.displayFormat >>= setColorKey' colorKey
+loadImage :: SDL.Renderer -> FilePath -> IO SDL.Texture
+loadImage renderer path = do
+  bmp <- SDL.loadBMP path
+  SDL.createTextureFromSurface renderer bmp
 
-setColorKey' Nothing s = return s
-setColorKey' (Just (r, g, b)) surface = (SDL.mapRGB . SDL.surfaceGetPixelFormat) surface r g b >>= SDL.setColorKey surface [SDL.SrcColorKey] >> return surface
-
-drawImage :: SDL.Surface -> SDL.Surface -> Pos -> IO Bool
-drawImage screen img (x,y) = SDL.blitSurface img Nothing screen offset
-    where
-        offset = Just SDL.Rect { SDL.rectX = x, SDL.rectY = y, SDL.rectW = 0, SDL.rectH = 0 }
-
+drawImage :: SDL.Renderer -> SDL.Texture -> Pos -> IO ()
+drawImage renderer tex (x,y) = do
+  ti <- SDL.queryTexture tex
+  let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
+  SDL.renderCopy renderer tex Nothing (Just $ SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h)))
+{-
 loadFont :: String -> Int -> IO SDL.Font
 loadFont = SDL.openFont
 
@@ -33,26 +35,23 @@ drawText :: SDL.Surface -> SDL.Font -> String -> Pos -> (Int,Int,Int) -> IO Bool
 drawText screen font text pos (r,g,b) = do
     surface <- SDL.renderTextSolid font text (SDL.Color (fromIntegral r) (fromIntegral g) (fromIntegral b))
     drawImage screen surface pos
-
-initialize :: Width -> Height -> Title -> IO SDL.Surface
+-}
+initialize :: Width -> Height -> Title -> IO SDL.Renderer
 initialize w h title = do
-    screen <- SDL.setVideoMode w h screenBpp [SDL.SWSurface]
-    SDL.setCaption title []
-    return screen
+    window <- SDL.createWindow (pack title) (SDL.defaultWindow { SDL.windowSize = V2 (fromIntegral w) (fromIntegral h) })
+    renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
+    return renderer
 
 type Color = (Int,Int,Int)
-drawRect :: SDL.Surface -> Pos -> Width -> Height -> Color -> IO ()
-drawRect screen (x,y) w h (r,g,b) = do
-    color <- (SDL.mapRGB . SDL.surfaceGetPixelFormat) screen (fromIntegral r) (fromIntegral g) (fromIntegral b)
-    SDL.fillRect screen (Just (SDL.Rect x y w h)) color
+drawRect :: SDL.Renderer -> Pos -> Width -> Height -> Color -> IO ()
+drawRect renderer (x,y) w h (r,g,b) = do
+    SDL.setRenderDrawColor renderer  (V4 (fromIntegral r) (fromIntegral g) (fromIntegral b) (fromIntegral 255))
+    let rect = SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h))
+    SDL.renderFillRect renderer (Just rect)
     return ()
 
-begin :: SDL.Surface -> IO ()
-begin screen = do
-    color <- (SDL.mapRGB . SDL.surfaceGetPixelFormat) screen 0xff 0xff 0xff
-    SDL.fillRect screen Nothing color
-    return ()
+begin :: SDL.Renderer -> IO ()
+begin = SDL.renderClear
 
-end :: SDL.Surface -> IO ()
-end screen = do
-    SDL.flip screen
+end :: SDL.Renderer -> IO ()
+end = SDL.renderPresent
