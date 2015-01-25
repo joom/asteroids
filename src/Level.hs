@@ -59,7 +59,7 @@ draw r (Level lC lev) = do
     -- last will force evaluation, and keep type IO ()
     sequence $ map (A.draw r) (asteroids lev)
 --    sequence $ map (P.draw r (players lev))
-    G.drawRect r (0,0) 640 480 (50,100,50)
+    G.drawRect r (0,0) 640 480 (0,0,0)
     P.draw r (player lev)
     -- Need to tell the GC to not free the music (SDL should really do this)
 --    touchForeignPtr . currMusic $ lC

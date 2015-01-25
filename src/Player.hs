@@ -25,8 +25,8 @@ update kS asts p = snd $ runState (updateS kS asts) p
 
 updateS :: KeyboardState -> [A.Asteroid] -> State Player ()
 updateS kS asts = do
-    direction -= if isDown kS SDL.ScancodeLeft then (5.0/360.0) else 0
-    direction += if isDown kS SDL.ScancodeRight then (5.0/360.0) else 0
+    direction -= if isDown kS SDL.ScancodeLeft then (20.0/360.0) else 0
+    direction += if isDown kS SDL.ScancodeRight then (20.0/360.0) else 0
     direction %= (`mod'` (2*pi))
     dir <- use direction
     if isDown kS SDL.ScancodeUp then do
@@ -38,9 +38,9 @@ updateS kS asts = do
     modify wrap
 
 draw :: SDL.Renderer -> Player -> IO ()
-draw r (Player (Rectangle x y _ _)  _ _ _ image) = do
+draw r (Player (Rectangle x y _ _)  _ dir _ image) = do
     img <- image
-    drawImage r img (x, y)
+    drawImage r img (x, y) dir
 
 move :: Player -> Player
 move p = (bounding.y +~ (floor $ p^.velocity._2)) . (bounding.x +~ (floor $ p^.velocity._1)) $ p

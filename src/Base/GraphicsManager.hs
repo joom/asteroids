@@ -22,11 +22,12 @@ loadImage renderer path = do
   bmp <- SDL.loadBMP path
   SDL.createTextureFromSurface renderer bmp
 
-drawImage :: SDL.Renderer -> SDL.Texture -> Pos -> IO ()
-drawImage renderer tex (x,y) = do
+drawImage :: SDL.Renderer -> SDL.Texture -> Pos -> Double -> IO ()
+drawImage renderer tex (x,y) rads = do
   ti <- SDL.queryTexture tex
   let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
-  SDL.renderCopy renderer tex Nothing (Just $ SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h)))
+  let degrees = realToFrac $ 360.0 * (rads/(2*pi))
+  SDL.renderCopyEx renderer tex Nothing (Just $ SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h))) degrees Nothing (V2 False False)
 {-
 loadFont :: String -> Int -> IO SDL.Font
 loadFont = SDL.openFont
