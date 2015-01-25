@@ -7,14 +7,12 @@ import Control.Monad.State
 import Control.Monad.Reader
 import qualified Player as P
 import qualified Level as L
-import qualified Platform as Platform
+import qualified Asteroids as A
 import qualified Base.GraphicsManager as G
 import qualified Base.InputHandler as IH
 import qualified Base.AudioManager as AM
-import qualified Base.Camera as C
 import qualified Base.Geometry as Geo
 import qualified Graphics.UI.SDL as SDL
-import qualified Switch as S
 import Timer
 import Config
 
