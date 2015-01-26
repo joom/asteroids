@@ -28,6 +28,11 @@ drawImage renderer tex (x,y) rads = do
   let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
   let degrees = realToFrac $ 360.0 * (rads/(2*pi))
   SDL.renderCopyEx renderer tex Nothing (Just $ SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h))) degrees Nothing (V2 False False)
+
+drawCircle :: SDL.Renderer -> Pos -> IO ()
+drawCircle r (x,y) = do
+    SDL.setRenderDrawColor r (V4 255 255 255 255)
+    SDL.renderDrawPoint r (P (V2 (fromIntegral x) (fromIntegral y)))
 {-
 loadFont :: String -> Int -> IO SDL.Font
 loadFont = SDL.openFont
@@ -52,7 +57,9 @@ drawRect renderer (x,y) w h (r,g,b) = do
     return ()
 
 begin :: SDL.Renderer -> IO ()
-begin = SDL.renderClear
+begin r = do
+    SDL.setRenderDrawColor r (V4 0 0 0 255)
+    SDL.renderClear r
 
 end :: SDL.Renderer -> IO ()
 end = SDL.renderPresent
