@@ -1,6 +1,6 @@
 module Base.InputHandler(KeyboardState, KeyState, initialize, update, isDown, isUp, isPressed, isReleased, putLastKeyboardState) where
 
-import qualified SDL as SDL
+import qualified SDL
 import qualified SDL.Input as SDL
 import qualified SDL.Input.Keyboard as SDL
 import qualified SDL.Input.Keyboard.Codes as SDL
@@ -26,7 +26,7 @@ initialKeyboardState = []
 
 set :: KeyboardState -> SDL.Scancode -> KeyState -> KeyboardState
 set [] k state = [(k,state)]
-set ((key,val):ks) k state = if key == k then ((key,state):ks) else (key,val) : (set ks k state)
+set ((key,val):ks) k state = if key == k then (key,state) : ks else (key,val) : set ks k state
 
 modKeyboardState :: KeyboardState -> SDL.KeyMotion -> SDL.Keysym -> KeyboardState
 modKeyboardState ks SDL.KeyDown (SDL.Keysym k _ _) = set ks k PRESSED
@@ -34,7 +34,7 @@ modKeyboardState ks SDL.KeyUp (SDL.Keysym k _ _) = set ks k RELEASED
 
 putLastKeyboardState :: KeyboardState -> KeyboardState
 putLastKeyboardState [] = []
-putLastKeyboardState (x:xs) = (modKey x) : (putLastKeyboardState xs)
+putLastKeyboardState (x:xs) = modKey x : putLastKeyboardState xs
     where
         modKey :: (SDL.Scancode,KeyState) -> (SDL.Scancode,KeyState)
         modKey (k,RELEASED) = (k,UP)
@@ -49,7 +49,7 @@ update ks = do
     event <- SDL.pollEvent
     case event of
         Nothing -> return (False,ks)
-        Just ev -> case (SDL.eventPayload ev) of
+        Just ev -> case SDL.eventPayload ev of
            SDL.QuitEvent -> return (True,ks)
            SDL.KeyboardEvent _ motion _ False sym -> update (modKeyboardState ks motion sym)
            _ -> update ks

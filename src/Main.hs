@@ -11,7 +11,7 @@ import qualified Asteroid as A
 import qualified Base.GraphicsManager as G
 import qualified Base.InputHandler as IH
 import qualified Base.Geometry as Geo
-import qualified SDL as SDL
+import qualified SDL
 import Timer
 import Config
 
@@ -38,7 +38,7 @@ getScreen :: MonadReader AppConfig m => m SDL.Renderer
 getScreen = liftM screen ask
 
 modifyFPSM :: MonadState AppData m => (Timer -> m Timer) -> m ()
-modifyFPSM act = (liftM fps get) >>= act >>= putFPS
+modifyFPSM act = liftM fps get >>= act >>= putFPS
 
 putLevel :: MonadState AppData m => L.Level -> m ()
 putLevel l = modify $ \s -> s { level = l }
@@ -82,7 +82,7 @@ loop = do
         -- Ensure framerate
 
         ticks <- getTimerTicks fps
-        when (ticks < secsPerFrame) $ do
+        when (ticks < secsPerFrame) $ 
             SDL.delay $ secsPerFrame - ticks
 
     unless quit loop

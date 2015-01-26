@@ -1,6 +1,6 @@
 module Base.GraphicsManager where
 
-import qualified SDL as SDL
+import qualified SDL
 import qualified SDL.Video as SDL
 import Linear as SDL
 import Linear.Affine (Point(P))
@@ -45,13 +45,12 @@ drawText screen font text pos (r,g,b) = do
 initialize :: Width -> Height -> Title -> IO SDL.Renderer
 initialize w h title = do
     window <- SDL.createWindow (pack title) (SDL.defaultWindow { SDL.windowSize = V2 (fromIntegral w) (fromIntegral h) })
-    renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
-    return renderer
+    SDL.createRenderer window (-1) SDL.defaultRenderer
 
 type Color = (Int,Int,Int)
 drawRect :: SDL.Renderer -> Pos -> Width -> Height -> Color -> IO ()
 drawRect renderer (x,y) w h (r,g,b) = do
-    SDL.setRenderDrawColor renderer  (V4 (fromIntegral r) (fromIntegral g) (fromIntegral b) (fromIntegral 255))
+    SDL.setRenderDrawColor renderer  (V4 (fromIntegral r) (fromIntegral g) (fromIntegral b) 255)
     let rect = SDL.Rectangle (P (V2 (fromIntegral x) (fromIntegral y))) (V2 (fromIntegral w) (fromIntegral h))
     SDL.renderFillRect renderer (Just rect)
     return ()

@@ -40,13 +40,13 @@ module Timer (Timer(), defaultTimer, start, stop, getTimerTicks, pause, unpause,
     getTimerTicks Timer { started=True, paused=False, startTicks=st } = SdlTime.ticks >>= \currTicks -> return $ currTicks - st
     
     pause :: Timer -> IO Timer
-    pause timer@Timer { started=True, paused=False, startTicks=st } = SdlTime.ticks >>= \currTicks ->    return $ timer { pausedTicks=(currTicks - st), paused=True, started=True }
+    pause timer@Timer { started=True, paused=False, startTicks=st } = SdlTime.ticks >>= \currTicks ->    return $ timer { pausedTicks=currTicks - st, paused=True, started=True }
     pause timer = return timer
     
     unpause :: Timer -> IO Timer
     unpause timer@Timer { paused=False } = return timer
     unpause timer@Timer { paused=True, pausedTicks=pausedTicks' } =
-         SdlTime.ticks >>= \currTicks -> return $ timer { startTicks=(currTicks - pausedTicks'), pausedTicks=0, paused=False }
+         SdlTime.ticks >>= \currTicks -> return $ timer { startTicks=currTicks - pausedTicks', pausedTicks=0, paused=False }
     
     isStarted :: Timer -> Bool
     isStarted Timer { started=s } = s

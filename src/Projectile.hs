@@ -2,7 +2,7 @@
 
 module Projectile where
 import Base.GraphicsManager(drawCircle)
-import qualified SDL as SDL
+import qualified SDL
 import Base.Geometry
 import Control.Lens
 
