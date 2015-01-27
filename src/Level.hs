@@ -63,11 +63,8 @@ updateS kS lC = do
             user <- use player
             projectiles %= map Pr.update
             projectiles %= filter (\p -> p^.Pr.life>0)
-            if IH.isDown kS SDL.ScancodeSpace
-              then
+            when (IH.isDown kS SDL.ScancodeSpace) $
                 projectiles %= (:) (newProjectile user)
-              else
-                return ()
             return . not . null $ asts
 
 draw :: SDL.Renderer -> Level -> IO ()
@@ -84,6 +81,4 @@ draw r (Level lC lev) = do
 -- Helper function
 
 skip :: Int -> [a] -> [a]
-skip _ [] = []
-skip 0 (x:xs) = xs
-skip n (x:xs) = x : skip (n-1) xs
+skip n = drop (n+2)
