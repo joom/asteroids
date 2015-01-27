@@ -27,13 +27,19 @@ loadImage renderer path = do
   SDL.createTextureFromSurface renderer bmp
 
 drawImage :: SDL.Renderer -> SDL.Texture -> Point V2 Int -> Double -> IO ()
-drawImage r tex pos rads = do
+drawImage r t p d = mapM_ (\i -> drawTexture r t (p+i) d) offsets
+    where
+      offsets = [ P $ V2 x y | x <- [-640,0,640 ], y <- [-480, 0, 480 ] ]
+
+drawTexture :: SDL.Renderer -> SDL.Texture -> Point V2 Int -> Double -> IO ()
+drawTexture r tex pos rads = do
   ti <- SDL.queryTexture tex
   let dims = V2 (SDL.textureWidth ti) (SDL.textureHeight ti)
   let degrees = realToFrac $ 360.0 * (rads/(2*pi))
   SDL.renderCopyEx r tex Nothing
       (Just $ SDL.Rectangle (fmap fromIntegral pos) dims)
       degrees Nothing (V2 False False)
+  
 
 drawCircle :: SDL.Renderer -> Point V2 Int -> IO ()
 drawCircle r pos = do

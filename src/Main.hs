@@ -13,6 +13,7 @@ import qualified Base.GraphicsManager as G
 import qualified Base.InputHandler as IH
 import qualified Base.Geometry as Geo
 import Control.Lens
+import Control.Applicative ((<$>))
 import qualified SDL
 import Timer
 
@@ -50,14 +51,8 @@ loop = do
     (quit,keyState) <- use keyboardState >>= liftIO . IH.update
 
     ticks <- use timer >>= fmap fromIntegral . liftIO . getTimerTicks
-    (won,nL) <- liftM (L.update keyState ticks) (use level)
-    screen    <- liftM screen ask
-
-    if won
-      then
-        liftIO (L.initialize screen ((L.lId . L.lC $ nL) + 1)) >>= (level .=)
-      else
-        level .= nL
+    (won,nL) <- L.update keyState ticks <$> use level
+    screen    <- screen <$> ask
 
     keyboardState .= IH.putLastKeyboardState keyState
 
@@ -72,6 +67,14 @@ loop = do
         when (ticks - lTicks < msecsPerFrame) $ 
             SDL.delay . fromIntegral $ msecsPerFrame - ticks + lTicks
     lastTicks .= ticks
+
+    if won
+      then do
+        lastTicks .= 0
+        use timer >>= liftIO . start >>= (timer .=)
+        liftIO (L.initialize screen ((nL^.L.lconfig^.L.lId) + 1)) >>= (level .=)
+      else
+        level .= nL
     unless quit loop
  where
     framesPerSecond = 20

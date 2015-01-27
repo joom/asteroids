@@ -21,15 +21,16 @@ data Player = Player
       , _direction :: Double
       , _alive     :: Bool
       , _image     :: IO SDL.Texture
+      , _lastShot  :: Int
     }
 
 makeLenses ''Player
 
 playerSize = V2 64 64
 
-initialize :: SDL.Renderer -> Point V2 Int -> Player
-initialize r pos = Player (R pos playerSize) 
-     (V2 0 0) 0 True (loadImage r "data/Asteroids_Spaceship.bmp")
+defaultPlayer :: SDL.Renderer -> Player
+defaultPlayer r = Player (R (P $ V2 320 240) playerSize)
+     (V2 0 0) 0 True (loadImage r "data/Asteroids_Spaceship.bmp") 0
 
 update :: KeyboardState -> [A.Asteroid] -> Player -> Player
 update kS asts = execState (updateS kS asts)

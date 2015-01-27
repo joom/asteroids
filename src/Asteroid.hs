@@ -18,7 +18,7 @@ data Asteroid =	Asteroid {
 makeLenses ''Asteroid
 
 levelSize :: Int -> Int
-levelSize = (*5)
+levelSize = (*10)
 
 asteroidInitialize :: Point V2 Int -> V2 Int -> Int -> Asteroid
 asteroidInitialize pos vel lvl  =  Asteroid (R pos size) vel lvl
@@ -26,8 +26,9 @@ asteroidInitialize pos vel lvl  =  Asteroid (R pos size) vel lvl
       size = V2 (levelSize lvl) (levelSize lvl)
 
 update :: Asteroid -> Asteroid
-update = move
-
+update a = (bounding.size .~ V2 newSize newSize) . move $ a
+    where
+      newSize = levelSize (a^.level)
 draw :: Renderer -> Asteroid -> IO ()
 draw r a = drawRect r (a^.bounding) (V4 255 255 255 255)
 
