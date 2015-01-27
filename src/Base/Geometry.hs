@@ -13,6 +13,11 @@ makeLenses ''Rectangle
 rToSDL :: (Num a) => Rectangle -> SDL.Rectangle a
 rToSDL (R p s) = fmap fromIntegral (SDL.Rectangle p s)
 
+hasIntersection :: Rectangle -> Rectangle -> Bool
+hasIntersection (R (P (V2 x y)) (V2 w h)) (R (P (V2 x1 y1)) (V2 w1 h1)) = inRange x w x1 w1 && inRange y h y1 h1
+	where
+		inRange p1 l1 p2 l2 = (p1 <= p2) && (p2 <= p1 + l1) || (p2 <= p1) && (p1 <= p2 +l2)
+
 wrap :: Rectangle -> Rectangle
 wrap = pos.lensP %~ (`modT` V2 640 480)
     where
