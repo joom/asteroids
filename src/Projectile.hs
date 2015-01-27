@@ -4,22 +4,29 @@ module Projectile where
 import Base.GraphicsManager(drawCircle)
 import qualified SDL
 import Base.Geometry
+import Linear
+import Linear.Affine
 import Control.Lens
+import Control.Monad.State
 
 data Projectile = Projectile {
-                  _bounding :: Shape
-                , _vel :: (Int,Int)
+                  _bounding :: Rectangle
+                , _vel :: V2 Int
+                , _life :: Int
                 }
 
 makeLenses ''Projectile
 
 update :: Projectile -> Projectile
-update p@(Projectile r@(Rectangle x y _ _) (dx,dy)) = p { _bounding = newR }
-    where
-        newR = r { _rectX=x+dx, _rectY=y+dy }
+update = execState updateS
+
+updateS :: State Projectile ()
+updateS = do
+    velocity <- use vel
+    bounding.pos.lensP += velocity
+    bounding %= wrap
+    life -= 1
 
 draw :: SDL.Renderer -> Projectile -> IO ()
-draw r (Projectile (Rectangle x y _ _) _) = drawCircle r (x, y)
+draw r p = drawCircle r $ p^.bounding^.pos
 
-offScreen :: Projectile -> Bool
-offScreen (Projectile (Rectangle x y _ _) _) = x < 0 || x > 640 || y < 0 || y > 480

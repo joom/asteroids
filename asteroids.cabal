@@ -24,7 +24,15 @@ executable asteroids
                      , sdl2 >=2.0.0
                      , lens
                      , mtl
-                     , linear == 1.16.1
+                     , linear
                      , text
   hs-source-dirs:      src
+  default-language:    Haskell2010
+
+Test-Suite test-asteroids
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  build-depends:       base >=4.7 && <4.8
+                     , QuickCheck
+  hs-source-dirs:      testsuite
   default-language:    Haskell2010

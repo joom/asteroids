@@ -3,13 +3,15 @@
 module Asteroid where
 
 import Base.GraphicsManager (drawRect)
-import Base.Geometry (Shape(..),collides,x,y)
+import Base.Geometry 
 import SDL (Renderer)
 import Control.Lens
+import Linear
+import Linear.Affine
 
 data Asteroid =	Asteroid {
-		  _bounding :: Shape,
-		  _vel :: (Int,Int),
+		  _bounding :: Rectangle,
+		  _vel :: V2 Int,
                   _level :: Int
 	      }
 
@@ -18,19 +20,17 @@ makeLenses ''Asteroid
 levelSize :: Int -> Int
 levelSize = (*5)
 
-asteroidInitialize :: (Int,Int) -> (Int,Int) -> Int -> Asteroid
-asteroidInitialize (x,y) vel lvl  =  Asteroid (Rectangle x y size size) vel lvl
+asteroidInitialize :: Point V2 Int -> V2 Int -> Int -> Asteroid
+asteroidInitialize pos vel lvl  =  Asteroid (R pos size) vel lvl
     where
-      size = levelSize lvl
+      size = V2 (levelSize lvl) (levelSize lvl)
 
 update :: Asteroid -> Asteroid
 update = move
 
 draw :: Renderer -> Asteroid -> IO ()
-draw r (Asteroid (Rectangle x y w h) _ _) = drawRect r (x,y) w h (0,0,0)
+draw r a = drawRect r (a^.bounding) (V4 255 255 255 255)
 
 move :: Asteroid -> Asteroid
-move mp@(Asteroid (Rectangle x y w h) (dx,dy) _) = (bounding .~ newRect) mp
-    where
-        newRect = Rectangle ((x+dx) `mod` 640) ((y+dy) `mod` 480) w h
-        
+move a = (bounding %~ wrap) . (bounding.pos.lensP +~ a^.vel) $ a
+

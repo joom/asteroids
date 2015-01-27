@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, TemplateHaskell #-}
 module Level where
 
 import Control.Monad
@@ -8,13 +8,14 @@ import qualified Asteroid as A
 import qualified Projectile as Pr
 import qualified Base.InputHandler as IH
 import qualified Base.GraphicsManager as G
-import qualified Base.Geometry as Geo
+import Base.Geometry
+import Linear
+import Linear.Affine
 import qualified SDL
 import SDL.Audio as SDL
-import Config
 import Timer
 import Foreign(touchForeignPtr)
-import Control.Lens((^.))
+import Control.Lens hiding (Level)
 
 data LevelConfig = LevelConfig {
     lId :: Int,
@@ -23,10 +24,12 @@ data LevelConfig = LevelConfig {
 }
 
 data LevelData = LevelData {
-    asteroids :: [A.Asteroid],
-    projectiles :: [Pr.Projectile],
-    player :: P.Player
+    _asteroids :: [A.Asteroid],
+    _projectiles :: [Pr.Projectile],
+    _player :: P.Player
 }
+
+makeLenses ''LevelData
 
 data Level = Level {
     lC :: LevelConfig,
@@ -38,7 +41,7 @@ initialize r 0 = -- do
     --m <- SDL.loadMUS "../assets/music/Aalborn_Pulse.mp3"
     return $ Level (LevelConfig 0 10 {-m-}) (LevelData [] [] (P.initialize r sPos))
     where
-        sPos = (0,200)
+        sPos = P $ V2 0 200
 
 update :: IH.KeyboardState -> Level -> (Bool,Level)
 update kS l@(Level lC lev) = (won,l { lD=nLD })
@@ -46,33 +49,34 @@ update kS l@(Level lC lev) = (won,l { lD=nLD })
         (won,nLD) = runState (updateS kS lC) lev
 
 newProjectile :: P.Player -> Pr.Projectile
-newProjectile (P.Player (Geo.Rectangle x y w h) (dx,dy) dir _ _) = Pr.Projectile (Geo.Rectangle x' y' 2 2) (dx',dy')
+newProjectile p = Pr.Projectile (R pt (V2 1 1)) v' 100
     where
-        (x',y') = (oX+dx',oY+dy')
-        dx' = floor . (*5.0) . cos $ dir
-        dy' = floor . (*5.0) . sin $ dir
-        oX = (+(x + w + 10)) . floor . (* cos dir) .  (/2) . fromIntegral $ w
-        oY = (+(y + h + 10)) . floor . (* sin dir) .  (/2) . fromIntegral $ h
+        v' =  fmap (floor . (*10.0)) (V2 (cos $ p^.P.direction) (sin $ p^.P.direction))
+        pt = P $ offset + v' + (p^.P.bounding^.pos^.lensP)
+        offset = fmap (`quot` 2) $ p^.P.bounding^.size
 
 updateS :: IH.KeyboardState -> LevelConfig -> State LevelData Bool
 updateS kS lC = do
-            obs <- gets $ map A.update . asteroids
-            projs <- gets $ map Pr.update . projectiles
-            currP <- gets player
-            let aObs = map A._bounding obs
-            lev <- get
-            let newPlayer =  P.update kS obs currP
-            let projs' = if IH.isDown kS SDL.ScancodeSpace then newProjectile newPlayer : projs  else projs
-            modify $ \t -> t { player=newPlayer, asteroids=obs, projectiles=projs' }
-            return . not . null $ obs
+            asteroids %= map A.update
+            asts <- use asteroids
+            player %= P.update kS asts 
+            user <- use player
+            projectiles %= map Pr.update
+            projectiles %= filter (\p -> p^.Pr.life>0)
+            if IH.isDown kS SDL.ScancodeSpace
+              then
+                projectiles %= (:) (newProjectile user)
+              else
+                return ()
+            return . not . null $ asts
 
 draw :: SDL.Renderer -> Level -> IO ()
 draw r (Level lC lev) = do
     -- last will force evaluation, and keep type IO ()
-    mapM_ (A.draw r) (asteroids lev)
+    mapM_ (A.draw r) (lev^.asteroids)
 --    sequence $ map (P.draw r (players lev))
-    mapM_ (Pr.draw r) (projectiles lev)
-    P.draw r (player lev)
+    mapM_ (Pr.draw r) (lev^.projectiles)
+    P.draw r (lev^.player)
     -- Need to tell the GC to not free the music (SDL should really do this)
 --    touchForeignPtr . currMusic $ lC
     return ()

@@ -11,15 +11,25 @@ import Control.Monad.State
 import Control.Lens
 import Control.Monad(when)
 import Data.Fixed(mod')
+import Linear
+import Linear.Affine
 
-data Player = Player { _bounding :: Shape, _velocity :: (Double,Double), _direction :: Double, _alive :: Bool, _image :: IO SDL.Texture }
+data Player = Player 
+    { 
+        _bounding  :: Rectangle
+      , _velocity  :: V2 Double
+      , _direction :: Double
+      , _alive     :: Bool
+      , _image     :: IO SDL.Texture
+    }
+
 makeLenses ''Player
 
-playerHeight = 20
-playerWidth = 20
+playerSize = V2 64 64
 
-initialize :: SDL.Renderer -> (Int,Int) -> Player
-initialize r (x,y) = Player (Rectangle x y playerWidth playerHeight) (0,2) 0 True (loadImage r "data/Asteroids_Spaceship.bmp")
+initialize :: SDL.Renderer -> Point V2 Int -> Player
+initialize r pos = Player (R pos playerSize) 
+     (V2 0 0) 0 True (loadImage r "data/Asteroids_Spaceship.bmp")
 
 update :: KeyboardState -> [A.Asteroid] -> Player -> Player
 update kS asts = execState (updateS kS asts)
@@ -31,19 +41,15 @@ updateS kS asts = do
     direction %= (`mod'` (2*pi))
     dir <- use direction
     when (isDown kS SDL.ScancodeUp) $ do
-        velocity._1 += cos dir
-        velocity._2 += sin dir
+        velocity._x += cos dir
+        velocity._y += sin dir
     modify move
-    modify wrap
+    bounding %= wrap
 
 draw :: SDL.Renderer -> Player -> IO ()
-draw r (Player (Rectangle x y _ _)  _ dir _ image) = do
-    img <- image
-    drawImage r img (x, y) dir
+draw r p = do
+    img <- p^.image
+    drawImage r img (p^.bounding^.pos) (p^.direction)
 
 move :: Player -> Player
-move p = (bounding.y +~ floor (p^.velocity._2)) . (bounding.x +~ floor (p^.velocity._1)) $ p
-
-wrap :: Player -> Player
-wrap = (bounding.y %~ (`mod` 480)) . (bounding.x %~ (`mod` 640))
-
+move p = bounding.pos.lensP +~ fmap floor (p^.velocity) $ p

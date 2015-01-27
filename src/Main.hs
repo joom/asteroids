@@ -13,7 +13,6 @@ import qualified Base.InputHandler as IH
 import qualified Base.Geometry as Geo
 import qualified SDL
 import Timer
-import Config
 
 screenBpp    = 32
 
@@ -48,7 +47,7 @@ putKeyboardState t = modify $ \s -> s { keyboardState = t }
 
 initEnv :: IO (AppConfig, AppData)
 initEnv = do    
-    screen <- G.initialize height width "Best Game Ever"
+    screen <- G.initialize 640 480 "Best Game Ever"
     (_,keys) <- IH.initialize
     level <- L.initialize screen 0
     fps <- start defaultTimer
