@@ -13,7 +13,7 @@ data Asteroid =	Asteroid {
 		  _bounding :: Rectangle,
 		  _vel :: V2 Int,
                   _level :: Int
-	      }
+	      } deriving (Eq)
 
 makeLenses ''Asteroid
 

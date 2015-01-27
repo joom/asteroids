@@ -13,7 +13,7 @@ data Projectile = Projectile {
                   _bounding :: Rectangle
                 , _vel :: V2 Int
                 , _life :: Int
-                }
+                } deriving (Eq)
 
 makeLenses ''Projectile
 

@@ -17,6 +17,7 @@ import Timer
 import Foreign(touchForeignPtr)
 import Control.Lens hiding (Level)
 import System.Random(randomR,mkStdGen,StdGen)
+import Control.Monad.Random
 
 data LevelConfig = LevelConfig {
     lId :: Int,
@@ -29,7 +30,8 @@ data LevelData = LevelData {
     _asteroids :: [A.Asteroid],
     _projectiles :: [Pr.Projectile],
     _player :: P.Player,
-    _asteroidsSpawned :: Int
+    _asteroidsSpawned :: Int,
+    _score :: Int
 }
 
 makeLenses ''LevelData
@@ -40,14 +42,14 @@ data Level = Level {
 }
 
 initialize :: SDL.Renderer -> Int -> IO Level
-initialize r 0 = -- do
+initialize r _ = -- do
     --m <- SDL.loadMUS "../assets/music/Aalborn_Pulse.mp3"
-    return $ Level (LevelConfig 0 10 10000{-m-}) (LevelData [] [] (P.initialize r sPos) 0)
+    return $ Level (LevelConfig 0 10 10000{-m-}) (LevelData [] [] (P.initialize r sPos) 0 0)
     where
         sPos = P $ V2 0 200
 
 update :: IH.KeyboardState -> Int -> Level -> (Bool,Level)
-update kS ticks l@(Level lC lev) =  (False, l { lD=nLD }) --(won,l { lD=nLD })
+update kS ticks l@(Level lC lev) =  (won,l { lD=nLD })
     where
         (won,nLD) = runState (updateS kS ticks lC) lev
 
@@ -59,19 +61,25 @@ newProjectile p = Pr.Projectile (R pt (V2 1 1)) v' 100
         offset = fmap (`quot` 2) $ p^.P.bounding^.size
 
 makeAsteroid :: Int -> A.Asteroid
-makeAsteroid n = A.asteroidInitialize coords vel 3
-    where
-        P vel = fmap floor . fmap (*speed) . normalize . fmap (fromIntegral :: Int -> Double) $ coords - (P (V2 320 240))
-        coords = P $ if vert == 0 then V2 0 y else V2 x 0
-        (x,r) = randomR (0,640) (mkStdGen n) :: (Int,StdGen)
-        (y,r1) = randomR (0,480) r :: (Int,StdGen)
-        (vert,r2) = randomR (0,1) r1 :: (Int,StdGen)
-        (speed,_) = randomR (5.0,15.0) r2 :: (Double,StdGen)
+makeAsteroid n = evalRand makeAsteroidS (mkStdGen n)
+
+makeAsteroidS :: Rand A.Asteroid
+makeAsteroidS = do
+        x <- inRange (0,640)
+        y <- inRange (0,480)
+        vert <- inRange (False,True)
+        let coords = P $ if vert then V2 0 y else V2 x 0
+        speed <- inRange (5.0,15.0)
+        let P vel = fmap (floor . (*speed)) . normalize . fmap i2d $ coords - P (V2 320 240)
+        return $ A.asteroidInitialize coords vel 3
+            where
+               i2d :: Int -> Double
+               i2d = fromIntegral
 
 updateS :: IH.KeyboardState -> Int -> LevelConfig -> State LevelData Bool
 updateS kS elapsedTicks lC = do
             asteroids %= map A.update
-            let ticksPerAst = (time lC) `quot` (numAsteroids lC)
+            let ticksPerAst = time lC `quot` numAsteroids lC
             let astsSpawnedByNow = elapsedTicks `quot` ticksPerAst
             spawned <- use asteroidsSpawned
             when (all (>spawned) [astsSpawnedByNow,numAsteroids lC]) $ do
@@ -83,12 +91,15 @@ updateS kS elapsedTicks lC = do
             projectiles %= map Pr.update
             -- get the intersection of asteroids and projectiles
             projs <- use projectiles
-            let projB = map Pr._bounding projs
-            asteroids %= filter (\a -> none (hasIntersection (a^.A.bounding)) projB) 
+            let intersection = [ (a,p) | a <- asts, p <- projs,
+                                 (a^.A.bounding) `hasIntersection` (p^.Pr.bounding) ]
+            asteroids %= filter (not . (`elem` map fst intersection))
+            projectiles %= filter (not . (`elem` map snd intersection)) 
             projectiles %= filter (\p -> p^.Pr.life>0)
+            score += length intersection
             when (IH.isDown kS SDL.ScancodeSpace) $
                 projectiles %= (:) (newProjectile user)
-            return . not . null $ asts
+            return $ spawned == numAsteroids lC  && null asts
 
 draw :: SDL.Renderer -> Level -> IO ()
 draw r (Level lC lev) = do
