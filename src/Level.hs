@@ -19,14 +19,16 @@ import Control.Lens hiding (Level)
 
 data LevelConfig = LevelConfig {
     lId :: Int,
-    numAsteroids :: Int--,
+    numAsteroids :: Int,
+    time :: Int
     --currMusic :: SDL.Music
 }
 
 data LevelData = LevelData {
     _asteroids :: [A.Asteroid],
     _projectiles :: [Pr.Projectile],
-    _player :: P.Player
+    _player :: P.Player,
+    _elapsedTicks :: Int
 }
 
 makeLenses ''LevelData
@@ -39,14 +41,14 @@ data Level = Level {
 initialize :: SDL.Renderer -> Int -> IO Level
 initialize r 0 = -- do
     --m <- SDL.loadMUS "../assets/music/Aalborn_Pulse.mp3"
-    return $ Level (LevelConfig 0 10 {-m-}) (LevelData [] [] (P.initialize r sPos))
+    return $ Level (LevelConfig 0 10 100{-m-}) (LevelData [] [] (P.initialize r sPos) 0)
     where
         sPos = P $ V2 0 200
 
-update :: IH.KeyboardState -> Level -> (Bool,Level)
-update kS l@(Level lC lev) = (won,l { lD=nLD })
+update :: IH.KeyboardState -> Int -> Level -> (Bool,Level)
+update kS ticks l@(Level lC lev) = (won,l { lD=nLD })
     where
-        (won,nLD) = runState (updateS kS lC) lev
+        (won,nLD) = runState (updateS kS ticks lC) lev
 
 newProjectile :: P.Player -> Pr.Projectile
 newProjectile p = Pr.Projectile (R pt (V2 1 1)) v' 100
@@ -55,14 +57,15 @@ newProjectile p = Pr.Projectile (R pt (V2 1 1)) v' 100
         pt = P $ offset + v' + (p^.P.bounding^.pos^.lensP)
         offset = fmap (`quot` 2) $ p^.P.bounding^.size
 
-updateS :: IH.KeyboardState -> LevelConfig -> State LevelData Bool
-updateS kS lC = do
+updateS :: IH.KeyboardState -> Int -> LevelConfig -> State LevelData Bool
+updateS kS ticks lC = do
             asteroids %= map A.update
             asts <- use asteroids
             player %= P.update kS asts 
             user <- use player
             projectiles %= map Pr.update
             projectiles %= filter (\p -> p^.Pr.life>0)
+            elapsedTicks += ticks
             when (IH.isDown kS SDL.ScancodeSpace) $
                 projectiles %= (:) (newProjectile user)
             return . not . null $ asts

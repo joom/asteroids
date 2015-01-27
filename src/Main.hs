@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, TemplateHaskell #-}
+
 module Main where
 
 import Data.Word
@@ -11,6 +12,7 @@ import qualified Asteroid as A
 import qualified Base.GraphicsManager as G
 import qualified Base.InputHandler as IH
 import qualified Base.Geometry as Geo
+import Control.Lens
 import qualified SDL
 import Timer
 
@@ -18,10 +20,13 @@ screenBpp    = 32
 
 
 data AppData = AppData {
-    level :: L.Level,
-    keyboardState :: IH.KeyboardState,
-    fps :: Timer
+    _level :: L.Level,
+    _keyboardState :: IH.KeyboardState,
+    _lastTicks :: Int,
+    _timer :: Timer
 }
+
+makeLenses ''AppData
 
 data AppConfig = AppConfig {
     screen    :: SDL.Renderer
@@ -30,64 +35,47 @@ data AppConfig = AppConfig {
 type AppState = StateT AppData IO
 type AppEnv = ReaderT AppConfig AppState
 
-putFPS :: MonadState AppData m => Timer -> m ()
-putFPS t = modify $ \s -> s { fps = t }
-
-getScreen :: MonadReader AppConfig m => m SDL.Renderer
-getScreen = liftM screen ask
-
-modifyFPSM :: MonadState AppData m => (Timer -> m Timer) -> m ()
-modifyFPSM act = liftM fps get >>= act >>= putFPS
-
-putLevel :: MonadState AppData m => L.Level -> m ()
-putLevel l = modify $ \s -> s { level = l }
-
-putKeyboardState :: MonadState AppData m => IH.KeyboardState -> m ()
-putKeyboardState t = modify $ \s -> s { keyboardState = t }
-
 initEnv :: IO (AppConfig, AppData)
 initEnv = do    
     screen <- G.initialize 640 480 "Best Game Ever"
     (_,keys) <- IH.initialize
     level <- L.initialize screen 0
     fps <- start defaultTimer
-    return (AppConfig screen, AppData level keys fps) 
+    return (AppConfig screen, AppData level keys 0 fps) 
 
 loop :: AppEnv ()
 loop = do
-    modifyFPSM $ liftIO . start
-
     -- Update Code
 
-    keyboardState <- liftM keyboardState get
-    (quit,keyState) <- liftIO $ IH.update keyboardState
-    putKeyboardState keyState
+    (quit,keyState) <- use keyboardState >>= liftIO . IH.update
 
-    fps <- liftM fps get
-    level <- liftM level get
-    let (won,nL) = L.update keyState level
-    screen    <- getScreen
-    if won then liftIO (L.initialize screen ((L.lId . L.lC $ nL) + 1)) >>= putLevel else putLevel nL
+    ticks <- use timer >>= fmap fromIntegral . liftIO . getTimerTicks
+    (won,nL) <- liftM (L.update keyState ticks) (use level)
+    screen    <- liftM screen ask
 
-    putKeyboardState $ IH.putLastKeyboardState keyState
+    if won
+      then
+        liftIO (L.initialize screen ((L.lId . L.lC $ nL) + 1)) >>= (level .=)
+      else
+        level .= nL
+
+    keyboardState .= IH.putLastKeyboardState keyState
 
     -- Drawing Code
-
+    lTicks <- use lastTicks
     liftIO $ do
         G.begin screen
         L.draw screen nL
         G.end screen
 
         -- Ensure framerate
-
-        ticks <- getTimerTicks fps
-        when (ticks < secsPerFrame) $ 
-            SDL.delay $ secsPerFrame - ticks
-
+        when (ticks - lTicks < msecsPerFrame) $ 
+            SDL.delay . fromIntegral $ msecsPerFrame - ticks + lTicks
+    lastTicks .= ticks
     unless quit loop
  where
     framesPerSecond = 20
-    secsPerFrame    = 1000 `div` framesPerSecond
+    msecsPerFrame    = 1000 `div` framesPerSecond
 
 runLoop :: AppConfig -> AppData -> IO ()
 runLoop = evalStateT . runReaderT loop
