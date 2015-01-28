@@ -61,7 +61,13 @@ initialize w h title = do
     SDL.createRenderer window (-1) SDL.defaultRenderer
 
 drawRect :: SDL.Renderer -> Rectangle -> V4 Int -> IO ()
-drawRect r rect color = do
+drawRect r (R p s) color = mapM_ (\i -> drawRectangle r (offset i) color) offsets
+    where
+        offsets = [ P $ V2 x y | x <- [-640,0,640], y <-[-480,0,480] ]
+        offset i = R (p+i) s
+
+drawRectangle :: SDL.Renderer -> Rectangle -> V4 Int -> IO ()
+drawRectangle r rect color = do
     SDL.setRenderDrawColor r (fmap fromIntegral color)
     SDL.renderFillRect r (Just . rToSDL $ rect)
 

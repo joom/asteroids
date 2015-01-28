@@ -18,7 +18,7 @@ data Asteroid =	Asteroid {
 makeLenses ''Asteroid
 
 levelSize :: Int -> Int
-levelSize = (*10)
+levelSize = floor . (2**) . fromIntegral . (+3)
 
 asteroidInitialize :: Point V2 Int -> V2 Int -> Int -> Asteroid
 asteroidInitialize pos vel lvl  =  Asteroid (R pos size) vel lvl

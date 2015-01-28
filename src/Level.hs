@@ -75,7 +75,7 @@ makeAsteroidS = do
         y <- inRange (0,480)
         vert <- inRange (False,True)
         let coords = P $ if vert then V2 0 y else V2 x 0
-        speed <- inRange (5.0,15.0)
+        speed <- inRange (2.0,5.0)
         let P vel = (floor . (*speed)) <$> normalize (fmap i2d $ coords - P (V2 320 240))
         return $ A.asteroidInitialize coords vel 3
             where
@@ -88,12 +88,12 @@ hitAsteroids projs = foldr (\a (acc,pcc) ->
                   if a^.A.level > 1
                     then
                       let copyA = (A.level -~ 1) a in
-                      let randA = (A.vel .~ V2 5 5) copyA in
+                      let randA = (A.vel .~ -copyA^.A.vel) copyA in
                       (randA : (copyA : acc), p : pcc)
                     else (acc,p : pcc)
                 Nothing -> (a : acc, pcc)) ([],[])
 
-hitProjectiles badProjs = foldr (\p acc -> if p^.Pr.life == 0 ||  any (==p) badProjs
+hitProjectiles badProjs = foldr (\p acc -> if p^.Pr.life == 0 ||  p `elem` badProjs
                 then acc
                 else p : acc) []
 
@@ -127,10 +127,10 @@ updateS kS elapsedTicks lC = do
             let (newAsts,badProjs) = hitAsteroids projs asts
             asteroids .= newAsts
             projectiles %= hitProjectiles badProjs
-            numAsts <- length <$> (use asteroids)
+            numAsts <- length <$> use asteroids
             score += length asts - numAsts
             canShoot <- (>250) . (elapsedTicks-) . P._lastShot <$> use player
-            when ((IH.isDown kS SDL.ScancodeSpace) &&
+            when (IH.isDown kS SDL.ScancodeSpace &&
                    canShoot ) $ do
                     player.P.lastShot .= elapsedTicks
                     projectiles %= (:) (newProjectile user)
