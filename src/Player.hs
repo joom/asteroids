@@ -13,6 +13,8 @@ import Control.Monad(when)
 import Data.Fixed(mod')
 import Linear
 import Linear.Affine
+import Base.GameComponent
+import Control.Applicative ((<$>))
 
 data Player = Player 
     { 
@@ -26,31 +28,30 @@ data Player = Player
 
 makeLenses ''Player
 
+player :: Player -> GameComponent Player
+player p = GameComponent
+         {
+           _update = (\kS _ -> player $ execState ( do
+	      direction -= if isDown kS SDL.ScancodeLeft then 1.0 / 9.0 else 0
+	      direction += if isDown kS SDL.ScancodeRight then 1.0 / 9.0 else 0
+	      direction %= (`mod'` (2*pi))
+	      dir <- use direction
+	      when (isDown kS SDL.ScancodeUp) $ do
+		  velocity._x += cos dir
+		  velocity._y += sin dir
+	      velocity %= clamp 10.0
+	      bounding.pos.lensP += (floor <$> p^.velocity)
+	      bounding %= wrap) p )
+         , _draw   = (\r -> do
+             img <- p^.image
+             drawImage r img (p^.bounding^.pos) (p^.direction))
+         , _value  = p
+         }
+
+
 playerSize = V2 64 64
 
-defaultPlayer :: SDL.Renderer -> Player
-defaultPlayer r = Player (R (P $ V2 320 240) playerSize)
+defaultPlayer :: SDL.Renderer -> GameComponent Player
+defaultPlayer r = player $ Player (R (P $ V2 320 240) playerSize)
      (V2 0 0) 0 True (loadImage r "data/Asteroids_Spaceship.bmp") 0
 
-update :: KeyboardState -> [A.Asteroid] -> Player -> Player
-update kS asts = execState (updateS kS asts)
-
-updateS :: KeyboardState -> [A.Asteroid] -> State Player ()
-updateS kS asts = do
-    direction -= if isDown kS SDL.ScancodeLeft then 1.0 / 9.0 else 0
-    direction += if isDown kS SDL.ScancodeRight then 1.0 / 9.0 else 0
-    direction %= (`mod'` (2*pi))
-    dir <- use direction
-    when (isDown kS SDL.ScancodeUp) $ do
-        velocity._x += cos dir
-        velocity._y += sin dir
-    modify move
-    bounding %= wrap
-
-draw :: SDL.Renderer -> Player -> IO ()
-draw r p = do
-    img <- p^.image
-    drawImage r img (p^.bounding^.pos) (p^.direction)
-
-move :: Player -> Player
-move p = bounding.pos.lensP +~ fmap floor (p^.velocity) $ p

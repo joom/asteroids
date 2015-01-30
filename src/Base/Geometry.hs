@@ -31,4 +31,10 @@ wrap r = pos.lensP %~ (`modH` V2 640 480) $ r
           | otherwise = v
         (V2 x y) `modT` (V2 x' y') = V2 (x `mod` x') (y `mod` y')
 
+speedSquared :: V2 Double -> Double
+speedSquared v = (v^._x)**2 + (v^._y)**2
 
+clamp :: Double -> V2 Double -> V2 Double
+clamp x v
+    | speedSquared v > x**2 = fmap (*x) . normalize $ v
+    | otherwise = v

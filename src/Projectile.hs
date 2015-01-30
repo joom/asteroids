@@ -2,7 +2,7 @@
 
 module Projectile where
 import Base.GraphicsManager(drawCircle)
-import qualified SDL
+import Base.GameComponent
 import Base.Geometry
 import Linear
 import Linear.Affine
@@ -17,16 +17,15 @@ data Projectile = Projectile {
 
 makeLenses ''Projectile
 
-update :: Projectile -> Projectile
-update = execState updateS
-
-updateS :: State Projectile ()
-updateS = do
-    velocity <- use vel
-    bounding.pos.lensP += velocity
-    bounding %= wrap
-    life -= 1
-
-draw :: SDL.Renderer -> Projectile -> IO ()
-draw r p = drawCircle r $ p^.bounding^.pos
-
+projectile :: Projectile -> GameComponent Projectile
+projectile p = GameComponent
+             {
+               _update = (\_ _ -> projectile $ execState ( do
+                   bounding.pos.lensP += p^.vel
+                   bounding %= wrap
+                   life -= 1) p)
+             , _draw   = (\r -> drawCircle r $ p^.bounding^.pos)
+             , _value  = p
+             }
+newProjectile :: Point V2 Int -> V2 Int -> GameComponent Projectile
+newProjectile pt v = projectile $ Projectile (R pt (V2 1 1)) v 100

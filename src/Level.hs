@@ -19,6 +19,7 @@ import Control.Lens hiding (Level)
 import System.Random(randomR,mkStdGen,StdGen)
 import Control.Monad.Random
 import Control.Applicative ((<$>))
+import Base.GameComponent
 
 data LevelConfig = LevelConfig {
     _lId :: Int,
@@ -30,9 +31,9 @@ data LevelConfig = LevelConfig {
 makeLenses ''LevelConfig
 
 data LevelData = LevelData {
-    _asteroids :: [A.Asteroid],
-    _projectiles :: [Pr.Projectile],
-    _player :: P.Player,
+    _asteroids :: [GameComponent A.Asteroid],
+    _projectiles :: [GameComponent Pr.Projectile],
+    _player :: GameComponent P.Player,
     _asteroidsSpawned :: Int,
     _score :: Int
 }
@@ -59,17 +60,10 @@ update kS ticks l@(Level lC lev) =  (won,ldata .~ nLD $ l)
     where
         (won,nLD) = runState (updateS kS ticks lC) lev
 
-newProjectile :: P.Player -> Pr.Projectile
-newProjectile p = Pr.Projectile (R pt (V2 1 1)) v' 100
-    where
-        v' =  (floor . (*10.0)) <$> V2 (cos $ p^.P.direction) (sin $ p^.P.direction)
-        pt = P $ offset + v' + (p^.P.bounding^.pos^.lensP)
-        offset = (`quot` 2) <$>  p^.P.bounding^.size
-
-makeAsteroid :: Int -> A.Asteroid
+makeAsteroid :: Int -> GameComponent A.Asteroid
 makeAsteroid n = evalRand makeAsteroidS (mkStdGen n)
 
-makeAsteroidS :: Rand A.Asteroid
+makeAsteroidS :: Rand (GameComponent A.Asteroid)
 makeAsteroidS = do
         x <- inRange (0,640)
         y <- inRange (0,480)
@@ -77,25 +71,41 @@ makeAsteroidS = do
         let coords = P $ if vert then V2 0 y else V2 x 0
         speed <- inRange (2.0,5.0)
         let P vel = (floor . (*speed)) <$> normalize (fmap i2d $ coords - P (V2 320 240))
-        return $ A.asteroidInitialize coords vel 3
+        return $ A.defaultAsteroid coords vel 3
             where
                i2d :: Int -> Double
                i2d = fromIntegral
 
-hitAsteroids projs = foldr (\a (acc,pcc) ->
+hitAsteroids :: [GameComponent Pr.Projectile] -> [GameComponent A.Asteroid] -> ([GameComponent A.Asteroid], [GameComponent Pr.Projectile])
+hitAsteroids projsG = foldr (\ga (acc,pcc) ->
+              let projs = map _value projsG in
+              let a = ga^.value in
               case firstCollision a projs of
                 Just p ->
                   if a^.A.level > 1
                     then
                       let copyA = (A.level -~ 1) a in
-                      let randA = (A.vel .~ -copyA^.A.vel) copyA in
-                      (randA : (copyA : acc), p : pcc)
-                    else (acc,p : pcc)
-                Nothing -> (a : acc, pcc)) ([],[])
+                      let randA = A.asteroid $ (A.vel .~ -copyA^.A.vel) copyA in
+                      (randA : ((A.asteroid copyA) : acc), (Pr.projectile p) : pcc)
+                    else (acc,(Pr.projectile p) : pcc)
+                Nothing -> (ga : acc, pcc)) ([],[])
 
-hitProjectiles badProjs = foldr (\p acc -> if p^.Pr.life == 0 ||  p `elem` badProjs
-                then acc
-                else p : acc) []
+
+newProjectile :: GameComponent P.Player -> GameComponent Pr.Projectile
+newProjectile p = Pr.newProjectile pt v'
+    where
+        v' =  (floor . (*10.0)) <$> V2 (cos $ p^.value^.P.direction) (sin $ p^.value^.P.direction)
+        pt = P $ offset + v' + (p^.value^.P.bounding^.pos^.lensP)
+        offset = (`quot` 2) <$>  p^.value^.P.bounding^.size
+
+
+
+hitProjectiles :: [GameComponent Pr.Projectile] -> [GameComponent Pr.Projectile] -> [GameComponent Pr.Projectile]
+hitProjectiles badProjsG =
+    let badProjs = map _value badProjsG in
+    foldr (\p acc -> if p^.value^.Pr.life == 0 ||  p^.value `elem` badProjs
+      then acc
+      else p : acc) []
 
 firstCollision :: A.Asteroid -> [Pr.Projectile] -> Maybe Pr.Projectile
 firstCollision _ [] = Nothing
@@ -106,22 +116,22 @@ firstCollision a (p:ps)
 collides :: A.Asteroid -> Pr.Projectile -> Bool
 collides a p = (a^.A.bounding) `hasIntersection` (p^.Pr.bounding)
 
-playerLives :: P.Player -> [A.Asteroid] -> Bool
-playerLives p = none (((p^.P.bounding)`hasIntersection`).A._bounding)
+playerLives :: GameComponent P.Player -> [GameComponent A.Asteroid] -> Bool
+playerLives p = none (((p^.value^.P.bounding)`hasIntersection`).A._bounding._value)
 
 updateS :: IH.KeyboardState -> Int -> LevelConfig -> State LevelData Bool
 updateS kS elapsedTicks lC = do
-            asteroids %= map A.update
+            asteroids %= map (\a -> _update a kS elapsedTicks)
             let astsSpawnedByNow = elapsedTicks * (lC^.numAsteroids) `quot` lC^.time
             spawned <- use asteroidsSpawned
             when (all (>spawned) [astsSpawnedByNow,lC^.numAsteroids]) $ do
                 asteroidsSpawned += 1
                 asteroids %= (:) (makeAsteroid elapsedTicks)
             asts <- use asteroids
-            player %= P.update kS asts 
+            player %= (\p -> _update p kS elapsedTicks)
             user <- use player
-            player.P.alive .= playerLives  user asts
-            projectiles %= map Pr.update
+            player.value.P.alive .= playerLives  user asts
+            projectiles %= map (\p -> _update p kS elapsedTicks)
             -- get the intersection of asteroids and projectiles
             projs <- use projectiles
             let (newAsts,badProjs) = hitAsteroids projs asts
@@ -129,19 +139,19 @@ updateS kS elapsedTicks lC = do
             projectiles %= hitProjectiles badProjs
             numAsts <- length <$> use asteroids
             score += length asts - numAsts
-            canShoot <- (>250) . (elapsedTicks-) . P._lastShot <$> use player
+            canShoot <- (>250) . (elapsedTicks-) . P._lastShot . _value <$> use player
             when (IH.isDown kS SDL.ScancodeSpace &&
                    canShoot ) $ do
-                    player.P.lastShot .= elapsedTicks
+                    player.value.P.lastShot .= elapsedTicks
                     projectiles %= (:) (newProjectile user)
             return $ spawned == (lC^.numAsteroids)  && null asts
 
 draw :: SDL.Renderer -> Level -> IO ()
 draw r (Level lC lev) = do
-    mapM_ (A.draw r) (lev^.asteroids)
+    mapM_ (\a -> _draw a r) (lev^.asteroids)
 --    sequence $ map (P.draw r (players lev))
-    mapM_ (Pr.draw r) (lev^.projectiles)
-    P.draw r (lev^.player)
+    mapM_ (\p -> _draw p r) (lev^.projectiles)
+    _draw (lev^.player) r
     -- Need to tell the GC to not free the music (SDL should really do this)
 --    touchForeignPtr . currMusic $ lC
     return ()
