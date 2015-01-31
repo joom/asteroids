@@ -2,30 +2,23 @@
 
 module Projectile where
 import Base.GraphicsManager(drawCircle)
-import Base.GameComponent
 import Base.Geometry
 import Linear
 import Linear.Affine
 import Control.Lens
-import Control.Monad.State
+import FRP.Netwire
 
 data Projectile = Projectile {
                   _bounding :: Rectangle
-                , _vel :: V2 Int
-                , _life :: Int
                 } deriving (Eq)
 
 makeLenses ''Projectile
 
-projectile :: Projectile -> GameComponent Projectile
-projectile p = GameComponent
-             {
-               _update = (\_ _ -> projectile $ execState ( do
-                   bounding.pos.lensP += p^.vel
-                   bounding %= wrap
-                   life -= 1) p)
-             , _draw   = (\r -> drawCircle r $ p^.bounding^.pos)
-             , _value  = p
-             }
-newProjectile :: Point V2 Int -> V2 Int -> GameComponent Projectile
-newProjectile pt v = projectile $ Projectile (R pt (V2 1 1)) v 100
+projectile :: Point V2 Int -> V2 Int -> Wire s e m a b
+projectile pt v = for 60 . projectilePosition pt v
+
+projectilePosition (P (V2 x y)) (V2 dx dy) = proc _ -> do
+    pos <- integral (x,y) . (pure (dx,dy)) -< ()
+    returnA -< wrap $ R (P (uncurry V2 $ pos)) (V2 1 1)
+
+renderProjectile r p = drawCircle r (p^.bounding^.pos)

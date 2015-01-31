@@ -11,27 +11,18 @@ import Linear.Affine
 
 data Asteroid =	Asteroid {
 		  _bounding :: Rectangle,
-		  _vel :: V2 Int,
                   _level :: Int
 	      } deriving (Eq)
 
 makeLenses ''Asteroid
 
-levelSize :: Int -> Int
-levelSize = floor . (2**) . fromIntegral . (+3)
+renderAsteroid :: Renderer -> Asteroid -> IO ()
+renderAsteroid r a = drawRect r (a^.bounding) (V4 255 255 255 255)
 
-asteroidInitialize :: Point V2 Int -> V2 Int -> Int -> Asteroid
-asteroidInitialize pos vel lvl  =  Asteroid (R pos size) vel lvl
-    where
-      size = V2 (levelSize lvl) (levelSize lvl)
-
-update :: Asteroid -> Asteroid
-update a = (bounding.size .~ V2 newSize newSize) . move $ a
-    where
-      newSize = levelSize (a^.level)
-draw :: Renderer -> Asteroid -> IO ()
-draw r a = drawRect r (a^.bounding) (V4 255 255 255 255)
-
-move :: Asteroid -> Asteroid
-move a = (bounding %~ wrap) . (bounding.pos.lensP +~ a^.vel) $ a
+asteroid :: Point V2 Int -> V2 Int -> Int -> Wire (Timed NominalDiffTime ()) () IO a Asteroid
+asteroid (P (V2 x y)) (V2 dx dy) lv = proc _ -> do
+    pos <- integral (x,y) . integral (dx,dy) -< ()
+    let sz = floor . (2**) . fromIntegral . (+3) $ lv
+    let rect = R (P (uncurry V2 $ pos)) (V2 sz sz)
+    returnA -< Asteroid (wrap rect) lv
 
