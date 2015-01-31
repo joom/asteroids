@@ -1,55 +1,31 @@
-module Base.InputHandler(KeyboardState, KeyState, initialize, update, isDown, isUp, isPressed, isReleased, putLastKeyboardState) where
+module Base.InputHandler(keyDown, keyUp, handleEvents) where
 
 import qualified SDL
-import qualified SDL.Input as SDL
-import qualified SDL.Input.Keyboard as SDL
-import qualified SDL.Input.Keyboard.Codes as SDL
-import Control.Monad.State(liftIO)
-data KeyState = UP | DOWN | PRESSED | RELEASED deriving (Prelude.Enum, Eq, Ord, Bounded, Show)
---data Key = KEY_LEFT | KEY_RIGHT | KEY_DOWN | KEY_UP deriving (Enum)
-type KeyboardState = [(SDL.Scancode,KeyState)]
 
-isDown :: KeyboardState -> SDL.Scancode -> Bool
-isDown kb key = (key,DOWN) `elem` kb
+keyDown :: SDL.Scancode -> [SDL.Scancode] -> Bool
+keyDown = elem
 
-isUp :: KeyboardState -> SDL.Scancode -> Bool
-isUp kb key = (key,UP) `elem` kb
+keyUp :: SDL.Scancode -> [SDL.Scancode] -> Bool
+keyUp = notElem
 
-isPressed :: KeyboardState -> SDL.Scancode -> Bool
-isPressed kb key = (key,PRESSED) `elem` kb
+press :: SDL.Scancode -> [SDL.Scancode] -> [SDL.Scancode]
+press sym [] = [sym]
+press sym (x:xs) = if x == sym then (x:xs) else x : press sym xs
 
-isReleased :: KeyboardState -> SDL.Scancode -> Bool
-isReleased kb key = (key,RELEASED) `elem` kb
+release :: SDL.Scancode -> [SDL.Scancode] -> [SDL.Scancode]
+release _ [] = []
+release sym (x:xs) = if x == sym then xs else x : release sym xs
 
-initialKeyboardState :: KeyboardState
-initialKeyboardState = []
-
-set :: KeyboardState -> SDL.Scancode -> KeyState -> KeyboardState
-set [] k state = [(k,state)]
-set ((key,val):ks) k state = if key == k then (key,state) : ks else (key,val) : set ks k state
-
-modKeyboardState :: KeyboardState -> SDL.KeyMotion -> SDL.Keysym -> KeyboardState
-modKeyboardState ks SDL.KeyDown (SDL.Keysym k _ _) = set ks k PRESSED
-modKeyboardState ks SDL.KeyUp (SDL.Keysym k _ _) = set ks k RELEASED
-
-putLastKeyboardState :: KeyboardState -> KeyboardState
-putLastKeyboardState [] = []
-putLastKeyboardState (x:xs) = modKey x : putLastKeyboardState xs
-    where
-        modKey :: (SDL.Scancode,KeyState) -> (SDL.Scancode,KeyState)
-        modKey (k,RELEASED) = (k,UP)
-        modKey (k,PRESSED) = (k,DOWN)
-        modKey k = k        
-
-initialize :: IO (Bool,KeyboardState)
-initialize = update initialKeyboardState
-
-update :: KeyboardState -> IO (Bool,KeyboardState)
-update ks = do
+handleEvents :: [SDL.Scancode] -> IO (Bool,[SDL.Scancode])
+handleEvents keysDown = do
     event <- SDL.pollEvent
     case event of
-        Nothing -> return (False,ks)
+        Nothing -> return (False,keysDown)
         Just ev -> case SDL.eventPayload ev of
-           SDL.QuitEvent -> return (True,ks)
-           SDL.KeyboardEvent _ motion _ False sym -> update (modKeyboardState ks motion sym)
-           _ -> update ks
+           SDL.QuitEvent -> return (True,keysDown)
+           SDL.KeyboardEvent _ SDL.KeyDown _ False (SDL.Keysym sym _ _) ->
+             handleEvents $ press sym keysDown
+           SDL.KeyboardEvent _ SDL.KeyUp _ False (SDL.Keysym sym _ _) ->
+             handleEvents $ release sym keysDown
+           _ -> handleEvents keysDown
+
