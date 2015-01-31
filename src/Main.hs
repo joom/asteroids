@@ -10,7 +10,7 @@ import qualified Player as P
 import qualified Level as L
 import qualified Asteroid as A
 import qualified Base.GraphicsManager as G
-import qualified Base.InputHandler as IH
+import Base.InputHandler
 import qualified Base.Geometry as Geo
 import Control.Lens
 import Control.Applicative ((<$>))
@@ -19,12 +19,12 @@ import Timer
 
 screenBpp    = 32
 
-
 data AppData = AppData {
-    _level :: L.Level,
-    _keyboardState :: IH.KeyboardState,
+    _level :: Wire s e m [SDL.Scancode] L.Level,
+    _keyboardState :: [SDL.Scancode],
     _lastTicks :: Int,
-    _timer :: Timer
+    _timer :: Timer,
+    _session :: Session t s
 }
 
 makeLenses ''AppData
@@ -38,43 +38,42 @@ type AppEnv = ReaderT AppConfig AppState
 
 initEnv :: IO (AppConfig, AppData)
 initEnv = do    
-    screen <- G.initialize 640 480 "Best Game Ever"
-    (_,keys) <- IH.initialize
+    screen <- G.initialize 640 480 "Asteroids"
     level <- L.initialize screen 0
     fps <- start defaultTimer
-    return (AppConfig screen, AppData level keys 0 fps) 
+    return (AppConfig screen, AppData level [] 0 fps) 
 
 loop :: AppEnv ()
 loop = do
     -- Update Code
 
-    (quit,keyState) <- use keyboardState >>= liftIO . IH.update
+    (quit,keysDown) <- use keyboardState >>= handleEvents
+    (v,s') <- use session >>= stepSession
+    session .= s'
 
-    ticks <- use timer >>= fmap fromIntegral . liftIO . getTimerTicks
-    (won,nL) <- L.update keyState ticks <$> use level
-    screen    <- screen <$> ask
+    lvl <- use level
+    (r,w') <- stepWire lvl v (Right keysDown)
+    level .= w'
+    case r of
+        Right (lvl',won) -> do
+	    screen    <- screen <$> ask
 
-    keyboardState .= IH.putLastKeyboardState keyState
+	    -- Drawing Code
+	    lTicks <- use lastTicks
+	    liftIO $ do
+		G.begin screen
+		L.renderLevel screen lvl'
+		G.end screen
 
-    -- Drawing Code
-    lTicks <- use lastTicks
-    liftIO $ do
-        G.begin screen
-        L.draw screen nL
-        G.end screen
+		-- Ensure framerate
+		when (ticks - lTicks < msecsPerFrame) $ 
+		    SDL.delay . fromIntegral $ msecsPerFrame - ticks + lTicks
+	    lastTicks .= ticks
 
-        -- Ensure framerate
-        when (ticks - lTicks < msecsPerFrame) $ 
-            SDL.delay . fromIntegral $ msecsPerFrame - ticks + lTicks
-    lastTicks .= ticks
-
-    if won
-      then do
-        lastTicks .= 0
-        use timer >>= liftIO . start >>= (timer .=)
-        liftIO (L.initialize screen ((nL^.L.lconfig^.L.lId) + 1)) >>= (level .=)
-      else
-        level .= nL
+	    when won $ do
+		lastTicks .= 0
+		use timer >>= liftIO . start >>= (timer .=)
+		liftIO (L.initialize screen ((nL^.L.lconfig^.L.lId) + 1)) >>= (level .=)
     unless quit loop
  where
     framesPerSecond = 20

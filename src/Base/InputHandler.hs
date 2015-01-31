@@ -16,7 +16,7 @@ release :: SDL.Scancode -> [SDL.Scancode] -> [SDL.Scancode]
 release _ [] = []
 release sym (x:xs) = if x == sym then xs else x : release sym xs
 
-handleEvents :: [SDL.Scancode] -> IO (Bool,[SDL.Scancode])
+handleEvents :: (MonadIO m) => [SDL.Scancode] -> m (Bool,[SDL.Scancode])
 handleEvents keysDown = do
     event <- SDL.pollEvent
     case event of
